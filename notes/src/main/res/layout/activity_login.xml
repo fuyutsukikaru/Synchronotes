@@ -20,18 +20,21 @@
         android:textColor="#fff"/>
 
     <EditText
-        android:layout_width="350dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/username"
         android:hint="Username"
         android:layout_gravity="center"
         android:layout_marginTop="80dp"
         android:layout_marginBottom="30dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:padding="10dp"
-        android:background="@drawable/textboxes"/>
+        android:background="@drawable/textboxes"
+        android:imeOptions=""/>
 
     <EditText
-        android:layout_width="350dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
         android:ems="10"
@@ -39,8 +42,11 @@
         android:hint="Password"
         android:layout_gravity="center"
         android:layout_marginBottom="20dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:padding="10dp"
-        android:background="@drawable/textboxes"/>
+        android:background="@drawable/textboxes"
+        android:imeOptions="actionDone" />
 
     <LinearLayout
         android:orientation="horizontal"
