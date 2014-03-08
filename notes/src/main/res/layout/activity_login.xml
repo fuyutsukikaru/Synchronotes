@@ -31,7 +31,8 @@
         android:layout_marginRight="15dp"
         android:padding="10dp"
         android:background="@drawable/textboxes"
-        android:imeOptions=""/>
+        android:singleLine="true"
+        android:imeOptions="actionNext"/>
 
     <EditText
         android:layout_width="match_parent"
@@ -77,5 +78,10 @@
             android:background="@drawable/signupbuttons"
             android:layout_gravity="bottom" />
      </LinearLayout>
+
+    <fragment class="com.fuyutsukikaru.synchronotes.notes.LoginActivity$SignUpFragment"
+        android:id="@+id/signup_frag"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>
