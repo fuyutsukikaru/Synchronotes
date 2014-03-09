@@ -42,6 +42,9 @@ public class LoginActivity extends Activity {
     Button login;
     Button signup;
 
+    private CharSequence mTitle;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,18 +67,37 @@ public class LoginActivity extends Activity {
             }
         );
 
+        final SignUpFragment sigfrag = SignUpFragment.newInstance();
+        /*FragmentManager fragman = getFragmentManager();
+        fragman.beginTransaction().hide(sigfrag).commit();*/
+
+        final FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.loginlayout, sigfrag)
+                .hide(sigfrag)
+                .setCustomAnimations(R.anim.bottom_up, R.anim.bottom_down)
+                .addToBackStack(null)
+                .commit();
+
         signup.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        FragmentManager fragmentManager = getFragmentManager();
-                        fragmentManager.beginTransaction()
-                                .add(R.id.signup_frag, SignUpFragment.newInstance())
-                                .commit();
+                        mTitle = "Sign Up";
+                        restoreActionBar();
+                        fragmentManager.beginTransaction().show(sigfrag).commit();
                         //setContentView(R.layout.fragment_signup);
                     }
                 }
         );
+    }
+
+    public void restoreActionBar() {
+        ActionBar actionBar = getActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(mTitle);
+        actionBar.show();
     }
 
     @Override
@@ -187,9 +209,11 @@ public class LoginActivity extends Activity {
 
     public static class SignUpFragment extends Fragment {
         /**
-         * Returns a new instance of this fragment for the given section
-         * number.
+         * Returns a new instance of this fragment
          */
+        /*private LayoutInflater mInflate;
+        private ViewGroup mViews;*/
+
         public static SignUpFragment newInstance() {
             SignUpFragment fragment = new SignUpFragment();
             return fragment;
@@ -201,20 +225,81 @@ public class LoginActivity extends Activity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+            /*mInflate = inflater;
+            mViews = container;*/
             View rootView = inflater.inflate(R.layout.fragment_signup, container, false);
+            //rootView.setVisibility(View.VISIBLE);
             return rootView;
         }
 
         /*@Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
+            View rootView = inflater.inflate(R.layout.fragment_signup, container, false);
+            rootView.setVisibility(View.VISIBLE);
+        }*/
+        /*@Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+            View rootView = mInflate.inflate(R.layout.fragment_signup, mViews, false);
+            rootView.setVisibility(View.VISIBLE);
         }*/
     }
 
     protected void signup(String username, String password, String pass2) {
-        Firebase userRef = fb.child("users/" + username);
-        userRef.child("password").setValue(password);
+        if (!password.equals(pass2)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Passwords do not match.")
+                    .setCancelable(false)
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+            return;
+        }
+
+        final String usercpy = username;
+        final String passcpy = password;
+        final boolean correct[] = {false};
+
+        Firebase userRef = fb.child("users").child(username);
+        System.out.println("Username is " + username);
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Object value = snapshot.getValue();
+                System.out.println("Here I am!");
+                if (value == null) {
+                    System.out.println("Here 1");
+                    Firebase userRef = fb.child("users/" + usercpy);
+                    userRef.child("password").setValue(passcpy);
+                }
+                else {
+                    correct[0] = true;
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError error) {
+                System.err.println("Listener was cancelled");
+            }
+        });
+
+        if (correct[0]) {
+            System.out.println("Here 3");
+            AlertDialog.Builder userError = new AlertDialog.Builder(this);
+            userError.setMessage("Username is already taken.")
+                    .setCancelable(false)
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog passAlert = userError.create();
+            passAlert.show();
+            return;
+        }
     }
 }
